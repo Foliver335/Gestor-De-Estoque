@@ -3,5 +3,6 @@ from view.main_view import MainView
 
 if __name__ == "__main__":
     root = tk.Tk()
+    LoginView(root)
     app = MainView(root)
     root.mainloop()
