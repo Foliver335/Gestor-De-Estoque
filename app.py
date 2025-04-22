@@ -1,8 +1,8 @@
 import tkinter as tk
-from view.main_view import MainView
+from view.login_view import LoginView
 
 if __name__ == "__main__":
     root = tk.Tk()
+    # crie a tela de login
     LoginView(root)
-    app = MainView(root)
     root.mainloop()
