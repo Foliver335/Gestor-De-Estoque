@@ -5,8 +5,11 @@ class AuthController:
         self.model = UserModel()
         self.model.create_table()
 
+    def user_exists(self, username, cpf) -> bool:
+        return self.model.exists(username, cpf)
+
     def create_user(self, *args):
-        # retorna o secret pra gerar o QR
+        # retorna o secret do TOTP
         return self.model.add_user(*args)
 
     def login(self, username, password, token):

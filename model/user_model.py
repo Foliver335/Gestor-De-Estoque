@@ -1,4 +1,3 @@
-import pyotp
 from model.db_connection import get_connection
 
 class UserModel:
@@ -6,22 +5,33 @@ class UserModel:
         conn = get_connection(); cur = conn.cursor()
         cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
-            id            SERIAL PRIMARY KEY,
-            username      VARCHAR(50) UNIQUE NOT NULL,
-            password      VARCHAR(255) NOT NULL,
-            first_name    VARCHAR(100) NOT NULL,
-            last_name     VARCHAR(100) NOT NULL,
-            matricula     VARCHAR(50)  NOT NULL,
-            cpf           VARCHAR(20)  NOT NULL,
-            patente       VARCHAR(50)  NOT NULL,
-            totp_secret   VARCHAR(32)  NOT NULL
+            id           SERIAL PRIMARY KEY,
+            username     VARCHAR(50) UNIQUE NOT NULL,
+            password     VARCHAR(255) NOT NULL,
+            first_name   VARCHAR(100) NOT NULL,
+            last_name    VARCHAR(100) NOT NULL,
+            matricula    VARCHAR(50)  NOT NULL,
+            cpf          VARCHAR(20)  UNIQUE NOT NULL,
+            patente      VARCHAR(50)  NOT NULL,
+            totp_secret  VARCHAR(32)  NOT NULL
         );
         """)
         conn.commit(); cur.close(); conn.close()
 
+    def exists(self, username, cpf):
+        conn = get_connection(); cur = conn.cursor()
+        cur.execute("""
+            SELECT 1 FROM users
+             WHERE username = %s OR cpf = %s
+        """, (username, cpf))
+        found = cur.fetchone() is not None
+        cur.close(); conn.close()
+        return found
+
     def add_user(self, username, password,
                  first_name, last_name,
                  matricula, cpf, patente):
+        import pyotp
         secret = pyotp.random_base32()
         conn = get_connection(); cur = conn.cursor()
         cur.execute("""
@@ -40,6 +50,7 @@ class UserModel:
         return secret
 
     def authenticate(self, username, password):
+        # retorna (id, username, secret) ou None
         conn = get_connection(); cur = conn.cursor()
         cur.execute("""
         SELECT id, username, totp_secret
@@ -48,9 +59,9 @@ class UserModel:
         """, (username, password))
         row = cur.fetchone()
         cur.close(); conn.close()
-        # row = (id, username, secret) ou None
         return row
 
     def verify_totp(self, secret, token):
+        import pyotp
         totp = pyotp.TOTP(secret)
         return totp.verify(token, valid_window=1)

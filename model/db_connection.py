@@ -6,9 +6,9 @@ def get_connection():
         return psycopg2.connect(
             host="127.0.0.1",             
             port=5432,                   
-            database="Materiais",   
+            database="estoque",   
             user="postgres",
-            password="root"
+            password="postgres"
         )
     except OperationalError as e:
         raise RuntimeError(f"Erro ao conectar no PostgreSQL: {e}")
