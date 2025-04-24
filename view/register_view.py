@@ -46,4 +46,3 @@ class RegisterView:
 
         self.ctrl.cadastrar(*dados)
         messagebox.showinfo("Sucesso", "Material cadastrado com sucesso!", parent=self.master)
-        self.master.destroy()

@@ -42,3 +42,4 @@ class EntryView:
                             f"Entrada registrada: {quantidade}x '{material[2]}'",
                             parent=self.master)
         self.master.destroy()
+
