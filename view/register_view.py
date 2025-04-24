@@ -6,35 +6,43 @@ class RegisterView:
     def __init__(self, master):
         self.master = master
         self.master.title("Cadastrar Material")
-        self.controller = MaterialController()
+        self.ctrl = MaterialController()
 
-        labels = ["Código:", "Nome:", "Quantidade:", "Unidade:", "Descrição:", "Validade (AAAA-MM-DD):"]
-        for idx, text in enumerate(labels):
-            tk.Label(master, text=text).grid(row=idx, column=0, sticky="e", padx=5, pady=2)
+        container = tk.Frame(master)
+        container.place(relx=0.5, rely=0.5, anchor="center")
+        container.pack(expand=True)   
 
-        self.codigo    = tk.Entry(master); self.codigo.grid(row=0, column=1, padx=5, pady=2)
-        self.nome      = tk.Entry(master); self.nome.grid(row=1, column=1, padx=5, pady=2)
-        self.quantidade= tk.Entry(master); self.quantidade.grid(row=2, column=1, padx=5, pady=2)
-        self.unidade   = tk.Entry(master); self.unidade.grid(row=3, column=1, padx=5, pady=2)
-        self.descricao = tk.Entry(master); self.descricao.grid(row=4, column=1, padx=5, pady=2)
-        self.validade  = tk.Entry(master); self.validade.grid(row=5, column=1, padx=5, pady=2)
 
-        tk.Button(master, text="Cadastrar", command=self.cadastrar_material).grid(row=6, column=0, columnspan=2, pady=10)
+        labels = ["Código:", "Nome:", "Quantidade:", "Unidade:", "Descrição:", "Validade (YYYY-MM-DD):"]
+        for i, text in enumerate(labels):
+            tk.Label(container, text=text).grid(row=i, column=0, sticky="e", pady=2)
 
-    def cadastrar_material(self):
+        self.codigo    = tk.Entry(container)
+        self.nome      = tk.Entry(container)
+        self.quantidade= tk.Entry(container)
+        self.unidade   = tk.Entry(container)
+        self.descricao = tk.Entry(container)
+        self.validade  = tk.Entry(container)
+
+        entries = [self.codigo, self.nome, self.quantidade, self.unidade, self.descricao, self.validade]
+        for i, w in enumerate(entries):
+            w.grid(row=i, column=1, padx=10, pady=2)
+
+        tk.Button(container, text="Cadastrar", width=20, command=self._cadastrar).grid(
+            row=len(labels), column=0, columnspan=2, pady=15)
+
+    def _cadastrar(self):
         try:
             dados = (
-                self.codigo.get(),
-                self.nome.get(),
+                self.codigo.get().strip(),
+                self.nome.get().strip(),
                 int(self.quantidade.get()),
-                self.unidade.get(),
-                self.descricao.get(),
-                self.validade.get()
+                self.unidade.get().strip(),
+                self.descricao.get().strip(),
+                self.validade.get().strip()
             )
         except ValueError:
-            messagebox.showerror("Erro", "Quantidade deve ser um número inteiro.")
-            return
+            return messagebox.showerror("Erro", "Quantidade deve ser um número inteiro.", parent=self.master)
 
-        self.controller.cadastrar(*dados)
-        messagebox.showinfo("Sucesso", "Material cadastrado com sucesso!")
-        self.master.destroy()
+        self.ctrl.cadastrar(*dados)
+        messagebox.showinfo("Sucesso", "Material cadastrado com sucesso!", parent=self.master)
